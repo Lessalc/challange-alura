@@ -25,4 +25,28 @@ public class VideosService {
 		
 		return video.orElseThrow(() -> new ResourceNotFoundException());
 	}
+
+	public Videos insert(Videos obj) {
+		return repository.save(obj);
+	}
+
+	public Videos update(Long id, Videos obj) {
+		Videos video = findById(id);
+		updateData(video, obj);
+		return repository.save(video);
+	}
+	
+	private void updateData(Videos oldObj, Videos newObj) {
+		oldObj.setTitulo(newObj.getTitulo());
+		oldObj.setDescricao(newObj.getDescricao());
+		oldObj.setUrl(newObj.getUrl());
+	}
+
+	public void delete(Long id) {
+		Videos obj = findById(id);
+		repository.delete(obj);
+	}
+	
+	
+	
 }
