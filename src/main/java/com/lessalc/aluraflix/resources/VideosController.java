@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import com.lessalc.aluraflix.dto.VideoDto;
 import com.lessalc.aluraflix.entities.Videos;
 import com.lessalc.aluraflix.services.VideosService;
 
@@ -36,10 +37,18 @@ public class VideosController {
 	}
 	
 	@GetMapping(value = "/{id}")
-	public ResponseEntity<Videos> findById(@PathVariable Long id){
+	public ResponseEntity<VideoDto> findById(@PathVariable Long id){
 		
 		Videos video = service.findById(id);
-		return ResponseEntity.ok().body(video);
+		VideoDto videoDto = new VideoDto(video);
+		return ResponseEntity.ok().body(videoDto);
+	}
+	
+	@GetMapping(value = "/")
+	public ResponseEntity<List<Videos>> findByTitulo(String titulo){
+		
+		List<Videos> videos = service.findByTitulo(titulo);
+		return ResponseEntity.ok().body(videos);
 	}
 	
 	@PostMapping	
