@@ -2,6 +2,7 @@ package com.lessalc.aluraflix.resources;
 
 import java.net.URI;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.validation.Valid;
 
@@ -29,19 +30,17 @@ public class VideosController {
 	private VideosService service;
 	
 	@GetMapping
-	public ResponseEntity<List<Videos>> findAll(){
+	public ResponseEntity<List<VideoDto>> findAll(){
 		
 		List<Videos> videos = service.findAll();
-		
-		return ResponseEntity.ok().body(videos);
+		return ResponseEntity.ok().body(videos.stream().map(VideoDto::new).collect(Collectors.toList()));
 	}
 	
 	@GetMapping(value = "/{id}")
 	public ResponseEntity<VideoDto> findById(@PathVariable Long id){
 		
 		Videos video = service.findById(id);
-		VideoDto videoDto = new VideoDto(video);
-		return ResponseEntity.ok().body(videoDto);
+		return ResponseEntity.ok().body(new VideoDto(video));
 	}
 	
 	@GetMapping(value = "/")

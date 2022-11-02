@@ -25,7 +25,7 @@ public class TestConfig implements CommandLineRunner {
 	
 		Videos videoTest = new Videos(null, "Filme Teste", "Essa é uma descricao de um filme teste", "http://url.aas.test");
 		
-		Categoria categoria = new Categoria(null, "Livre");
+		Categoria categoria = new Categoria(null, "OutroLivre");
 		categoriaRepository.save(categoria);
 
 		videoTest.setCategoriaId(categoria);

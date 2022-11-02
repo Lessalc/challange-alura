@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Service;
 
 import com.lessalc.aluraflix.entities.Categoria;
@@ -16,10 +17,10 @@ import com.lessalc.aluraflix.services.exception.ResourceNotFoundException;
 public class VideosService {
 
 	@Autowired
-	VideosRepository repository;
+	private VideosRepository repository;
 	
 	@Autowired
-	CategoriaRepository CategoriaRepository;
+	private CategoriaRepository categoriaRepository;
 	
 	public List<Videos> findAll(){
 		return repository.findAll();
@@ -33,8 +34,14 @@ public class VideosService {
 
 	public Videos insert(Videos obj) {
 		if (obj.getCategoriaId() == null) {
-			Categoria categoria = CategoriaRepository.findById(1L).get();
-			obj.setCategoriaId(categoria);
+			try {
+				Categoria categoria = categoriaRepository.findById(1L).orElseThrow(Exception::new);
+				obj.setCategoriaId(categoria);
+			} catch(Exception e) {
+				Categoria categoria = new Categoria(1L, "Livre");
+				categoriaRepository.save(categoria);
+				obj.setCategoriaId(categoria);
+			}
 		}
 		return repository.save(obj);
 	}
