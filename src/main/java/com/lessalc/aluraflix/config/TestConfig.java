@@ -13,14 +13,21 @@ import com.lessalc.aluraflix.repositories.VideosRepository;
 public class TestConfig implements CommandLineRunner {
 
 	@Autowired
-	private VideosRepository repository;
+	private VideosRepository videoRepository;
+
+	@Autowired
+	private CategoriaRepository categoriaRepository;
 	
 	@Override
 	public void run(String... args) throws Exception {
-	
+
 		Videos videoTest = new Videos(null, "Filme Teste", "Essa é uma descricao de um filme teste", "http://url.aas.test");
-		
-		repository.save(videoTest);
+
+		Categoria categoria = new Categoria(null, "OutroLivre");
+		categoriaRepository.save(categoria);
+
+		videoTest.setCategoriaId(categoria);
+		videoRepository.save(videoTest);
 		
 	}
 
