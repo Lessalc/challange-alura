@@ -10,17 +10,13 @@ import com.lessalc.aluraflix.entities.Videos;
 import com.lessalc.aluraflix.repositories.CategoriaRepository;
 import com.lessalc.aluraflix.repositories.VideosRepository;
 
-@Configuration
-@Profile("test")
+//@Configuration
+//@Profile("test")
 public class TestConfig implements CommandLineRunner {
 
 	@Autowired
 	private VideosRepository videoRepository;
-<<<<<<< HEAD
 
-=======
-	
->>>>>>> f18b7df97ba89ea69037d0c1a62b4df45dff8530
 	@Autowired
 	private CategoriaRepository categoriaRepository;
 	
@@ -28,11 +24,7 @@ public class TestConfig implements CommandLineRunner {
 	public void run(String... args) throws Exception {
 
 		Videos videoTest = new Videos(null, "Filme Teste", "Essa é uma descricao de um filme teste", "http://url.aas.test");
-<<<<<<< HEAD
 
-=======
-		
->>>>>>> f18b7df97ba89ea69037d0c1a62b4df45dff8530
 		Categoria categoria = new Categoria(null, "OutroLivre");
 		categoriaRepository.save(categoria);
 

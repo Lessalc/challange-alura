@@ -47,6 +47,14 @@ public class Videos implements Serializable{
 		this.url = url;
 	}
 
+	public Videos(String titulo, String descricao, String url, Categoria categoria) {
+		super();
+		this.titulo = titulo;
+		this.descricao = descricao;
+		this.url = url;
+		this.categoriaId = categoria;
+	}
+
 	public Long getId() {
 		return id;
 	}

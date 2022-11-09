@@ -6,6 +6,8 @@ import java.util.stream.Collectors;
 
 import javax.validation.Valid;
 
+import com.lessalc.aluraflix.dto.VideoForm;
+import com.lessalc.aluraflix.dto.VideoUpdate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -51,16 +53,16 @@ public class VideosController {
 	}
 	
 	@PostMapping	
-	public ResponseEntity<Videos> insert(@RequestBody @Valid Videos obj){
-		obj = service.insert(obj);
+	public ResponseEntity<Videos> insert(@RequestBody @Valid VideoForm obj){
+		Videos video = service.insert(obj);
 		// Criando um objeto URI para que possamos ter a localização no nosso header de onde o objeto foi criado
-		URI uri =  ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(obj.getId()).toUri();
-		return ResponseEntity.created(uri).body(obj);
+		URI uri =  ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(video.getId()).toUri();
+		return ResponseEntity.created(uri).body(video);
 	}
 	
 	@PutMapping(value = "/{id}")
-	public ResponseEntity<Videos> update(@PathVariable Long id ,@RequestBody Videos obj){
-		obj = service.update(id, obj);
+	public ResponseEntity<Videos> update(@PathVariable Long id ,@RequestBody VideoUpdate newObj){
+		Videos obj = service.update(id, newObj);
 		URI uri =  ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(obj.getId()).toUri();
 		return ResponseEntity.created(uri).body(obj);	
 	}

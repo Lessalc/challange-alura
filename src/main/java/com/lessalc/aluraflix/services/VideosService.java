@@ -3,6 +3,8 @@ package com.lessalc.aluraflix.services;
 import java.util.List;
 import java.util.Optional;
 
+import com.lessalc.aluraflix.dto.VideoForm;
+import com.lessalc.aluraflix.dto.VideoUpdate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Service;
@@ -14,7 +16,8 @@ import com.lessalc.aluraflix.repositories.VideosRepository;
 import com.lessalc.aluraflix.services.exception.ResourceNotFoundException;
 
 @Service
-public class VideosService {
+public class
+VideosService {
 
 	@Autowired
 	private VideosRepository repository;
@@ -32,30 +35,39 @@ public class VideosService {
 		return video.orElseThrow(() -> new ResourceNotFoundException());
 	}
 
-	public Videos insert(Videos obj) {
-		if (obj.getCategoriaId() == null) {
-			try {
-				Categoria categoria = categoriaRepository.findById(1L).orElseThrow(Exception::new);
-				obj.setCategoriaId(categoria);
-			} catch(Exception e) {
-				Categoria categoria = new Categoria(1L, "Livre");
-				categoriaRepository.save(categoria);
-				obj.setCategoriaId(categoria);
-			}
+	public Videos insert(VideoForm obj) {
+		Videos videos;
+		Optional<Categoria> optionalCategoria = categoriaRepository.findById(obj.getCategoria());
+		if(optionalCategoria.isPresent()){
+			videos = new Videos(obj.getTitulo(), obj.getDescricao(), obj.getUrl(), optionalCategoria.get());
+		} else{
+			optionalCategoria = categoriaRepository.findById(1L);
+			videos = new Videos(obj.getTitulo(), obj.getDescricao(), obj.getUrl(), optionalCategoria.get());
 		}
-		return repository.save(obj);
+		return repository.save(videos);
 	}
 
-	public Videos update(Long id, Videos obj) {
+	public Videos update(Long id, VideoUpdate obj) {
 		Videos video = findById(id);
 		updateData(video, obj);
 		return repository.save(video);
 	}
 	
-	private void updateData(Videos oldObj, Videos newObj) {
-		oldObj.setTitulo(newObj.getTitulo());
-		oldObj.setDescricao(newObj.getDescricao());
-		oldObj.setUrl(newObj.getUrl());
+	private void updateData(Videos oldObj, VideoUpdate newObj) {
+		if(newObj.getTitulo() != null)
+			if(newObj.getTitulo().length() > 0)
+				oldObj.setTitulo(newObj.getTitulo());
+		if(newObj.getDescricao() != null)
+			if(newObj.getDescricao().length() >= 10)
+				oldObj.setDescricao(newObj.getDescricao());
+		if(newObj.getUrl() != null)
+			if(newObj.getUrl().length() >= 10)
+				oldObj.setUrl(newObj.getUrl());
+
+		if(newObj.getCategoria() != null){
+			Optional<Categoria> optionalCategoria = categoriaRepository.findById(newObj.getCategoria());
+			optionalCategoria.ifPresent(oldObj::setCategoriaId);
+		}
 	}
 
 	public void delete(Long id) {
