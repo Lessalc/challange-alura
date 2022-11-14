@@ -37,12 +37,17 @@ VideosService {
 
 	public Videos insert(VideoForm obj) {
 		Videos videos;
-		Optional<Categoria> optionalCategoria = categoriaRepository.findById(obj.getCategoria());
-		if(optionalCategoria.isPresent()){
+		if(obj.getCategoria() == null){
+			Optional<Categoria> optionalCategoria = categoriaRepository.findById(1L);
 			videos = new Videos(obj.getTitulo(), obj.getDescricao(), obj.getUrl(), optionalCategoria.get());
 		} else{
-			optionalCategoria = categoriaRepository.findById(1L);
-			videos = new Videos(obj.getTitulo(), obj.getDescricao(), obj.getUrl(), optionalCategoria.get());
+			Optional<Categoria> optionalCategoria = categoriaRepository.findById(obj.getCategoria());
+			if(optionalCategoria.isPresent()){
+				videos = new Videos(obj.getTitulo(), obj.getDescricao(), obj.getUrl(), optionalCategoria.get());
+			} else{
+				optionalCategoria = categoriaRepository.findById(1L);
+				videos = new Videos(obj.getTitulo(), obj.getDescricao(), obj.getUrl(), optionalCategoria.get());
+			}
 		}
 		return repository.save(videos);
 	}
