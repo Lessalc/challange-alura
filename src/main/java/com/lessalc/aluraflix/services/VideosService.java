@@ -16,8 +16,7 @@ import com.lessalc.aluraflix.repositories.VideosRepository;
 import com.lessalc.aluraflix.services.exception.ResourceNotFoundException;
 
 @Service
-public class
-VideosService {
+public class VideosService {
 
 	@Autowired
 	private VideosRepository repository;
@@ -36,20 +35,24 @@ VideosService {
 	}
 
 	public Videos insert(VideoForm obj) {
-		Videos videos;
+		Videos videos = retornaObjetoVideo(obj);
+
+		return repository.save(videos);
+	}
+
+	protected Videos retornaObjetoVideo(VideoForm obj){
 		if(obj.getCategoria() == null){
 			Optional<Categoria> optionalCategoria = categoriaRepository.findById(1L);
-			videos = new Videos(obj.getTitulo(), obj.getDescricao(), obj.getUrl(), optionalCategoria.get());
+			return new Videos(obj.getTitulo(), obj.getDescricao(), obj.getUrl(), optionalCategoria.get());
 		} else{
 			Optional<Categoria> optionalCategoria = categoriaRepository.findById(obj.getCategoria());
 			if(optionalCategoria.isPresent()){
-				videos = new Videos(obj.getTitulo(), obj.getDescricao(), obj.getUrl(), optionalCategoria.get());
+				return new Videos(obj.getTitulo(), obj.getDescricao(), obj.getUrl(), optionalCategoria.get());
 			} else{
 				optionalCategoria = categoriaRepository.findById(1L);
-				videos = new Videos(obj.getTitulo(), obj.getDescricao(), obj.getUrl(), optionalCategoria.get());
+				return new Videos(obj.getTitulo(), obj.getDescricao(), obj.getUrl(), optionalCategoria.get());
 			}
 		}
-		return repository.save(videos);
 	}
 
 	public Videos update(Long id, VideoUpdate obj) {
@@ -58,7 +61,7 @@ VideosService {
 		return repository.save(video);
 	}
 	
-	private void updateData(Videos oldObj, VideoUpdate newObj) {
+	protected void updateData(Videos oldObj, VideoUpdate newObj) {
 		if(newObj.getTitulo() != null)
 			if(newObj.getTitulo().length() > 0)
 				oldObj.setTitulo(newObj.getTitulo());
@@ -84,7 +87,4 @@ VideosService {
 		
 		return repository.findByTituloContainingIgnoreCase(titulo);
 	}
-	
-	
-	
 }

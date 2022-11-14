@@ -146,7 +146,7 @@ public class VideosControllerTest {
 
         mockMvc.perform(MockMvcRequestBuilders
                     .delete(uri))
-                .andExpect(MockMvcResultMatchers.status().isOk());
+                .andExpect(MockMvcResultMatchers.status().isNoContent());
     }
 
     @Test

@@ -71,7 +71,7 @@ public class VideosController {
 	@DeleteMapping(value = "/{id}")
 	public ResponseEntity<String> delete(@PathVariable Long id){
 		service.delete(id);
-		return ResponseEntity.ok().body("Operação concluída com sucesso");
+		return ResponseEntity.noContent().build();
 	}
 			
 	

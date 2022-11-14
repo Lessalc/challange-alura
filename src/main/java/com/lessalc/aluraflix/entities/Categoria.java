@@ -1,6 +1,7 @@
 package com.lessalc.aluraflix.entities;
 
 import java.util.List;
+import java.util.Objects;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -70,5 +71,18 @@ public class Categoria {
 
     public void setCor(String cor) {
         this.cor = cor;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Categoria)) return false;
+        Categoria categoria = (Categoria) o;
+        return Objects.equals(getId(), categoria.getId());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getId());
     }
 }
