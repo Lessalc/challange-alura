@@ -151,4 +151,31 @@ public class VideosControllerTest {
                 .andExpect(MockMvcResultMatchers.jsonPath("$.error").value("Não encontrado!"));
     }
 
+    @Test
+    public void deveriaRetornarVideoQuandoBuscamosPeloTitulo() throws Exception{
+        String titulo = "teste";
+        URI uri = new URI("/videos/");
+
+        mockMvc.perform(MockMvcRequestBuilders
+                    .get(uri)
+                    .queryParam("titulo","teste"))
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.jsonPath("$[0].categoriaId.id").value(1L))
+                .andExpect(MockMvcResultMatchers.jsonPath("$[0].titulo").value("Filme Teste"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$[0].descricao").value("Essa é uma descricao de um filme teste"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$[0].url").value("http://url.aas.test"));
+    }
+
+    @Test
+    public void deveriaFalharEmRetornarVideoQuandoBuscamosPorUmTituloInexistente() throws Exception{
+        String titulo = "outro";
+        URI uri = new URI("/videos/");
+
+        mockMvc.perform(MockMvcRequestBuilders
+                    .get(uri)
+                    .queryParam("titulo",titulo))
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.jsonPath("$").isEmpty());
+    }
+
 }
