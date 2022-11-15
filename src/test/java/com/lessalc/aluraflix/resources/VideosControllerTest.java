@@ -35,9 +35,7 @@ public class VideosControllerTest {
                         .post(uri)
                         .content(novoVideo)
                         .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(MockMvcResultMatchers
-                        .status()
-                        .is(201));
+                .andExpect(MockMvcResultMatchers.status().is(201));
     }
 
     @Test
@@ -50,9 +48,7 @@ public class VideosControllerTest {
                         .post(uri)
                         .content(novoVideo)
                         .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(MockMvcResultMatchers
-                        .status()
-                        .is(400));
+                .andExpect(MockMvcResultMatchers.status().is(400));
     }
 
     @Test
@@ -65,9 +61,7 @@ public class VideosControllerTest {
                         .post(uri)
                         .content(novoVideo)
                         .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(MockMvcResultMatchers
-                        .status()
-                        .is(201))
+                .andExpect(MockMvcResultMatchers.status().is(201))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.categoriaId.id").value(1L));
     }
 
@@ -81,9 +75,7 @@ public class VideosControllerTest {
                         .post(uri)
                         .content(novoVideo)
                         .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(MockMvcResultMatchers
-                        .status()
-                        .is(201))
+                .andExpect(MockMvcResultMatchers.status().is(201))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.categoriaId.id").value(1L));
     }
 

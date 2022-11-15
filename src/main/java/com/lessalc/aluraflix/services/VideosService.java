@@ -40,7 +40,7 @@ public class VideosService {
 		return repository.save(videos);
 	}
 
-	protected Videos retornaObjetoVideo(VideoForm obj){
+	private Videos retornaObjetoVideo(VideoForm obj){
 		if(obj.getCategoria() == null){
 			Optional<Categoria> optionalCategoria = categoriaRepository.findById(1L);
 			return new Videos(obj.getTitulo(), obj.getDescricao(), obj.getUrl(), optionalCategoria.get());
@@ -61,7 +61,7 @@ public class VideosService {
 		return repository.save(video);
 	}
 	
-	protected void updateData(Videos oldObj, VideoUpdate newObj) {
+	private void updateData(Videos oldObj, VideoUpdate newObj) {
 		if(newObj.getTitulo() != null)
 			if(newObj.getTitulo().length() > 0)
 				oldObj.setTitulo(newObj.getTitulo());

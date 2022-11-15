@@ -2,19 +2,18 @@ package com.lessalc.aluraflix.services;
 
 import com.lessalc.aluraflix.dto.VideoForm;
 import com.lessalc.aluraflix.dto.VideoUpdate;
-import com.lessalc.aluraflix.entities.Categoria;
 import com.lessalc.aluraflix.entities.Videos;
 import com.lessalc.aluraflix.repositories.CategoriaRepository;
-import com.lessalc.aluraflix.repositories.VideosRepository;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import javax.validation.*;
 import java.util.Optional;
+import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -28,114 +27,106 @@ public class VideosServiceTest {
     @Autowired
     CategoriaRepository categoriaRepository;
 
-
     @Test
     public void testaUpdateQuandoTodosItensSaoAtualizados(){
-
-        Videos oldObj = new Videos(null, "VideoTeste-Inicial", "DescricaoTeste-Inicial", "UrlTeste-Inicial");
         VideoUpdate newObj = new VideoUpdate();
         newObj.setTitulo("VideoTeste-Atualizado");
         newObj.setDescricao("DescricaoTeste-Atualizado");
         newObj.setUrl("UrlTeste-Atualizado");
 
-        service.updateData(oldObj, newObj);
+        Videos videoUpdated = service.update(1L, newObj);
 
-        assertEquals(oldObj.getTitulo(), newObj.getTitulo());
-        assertEquals(oldObj.getDescricao(), newObj.getDescricao());
-        assertEquals(oldObj.getUrl(), newObj.getUrl());
-        assertEquals(oldObj.getUrl(), "UrlTeste-Atualizado");
+        Videos videoId1 = service.findById(1L);
+
+        assertEquals(newObj.getTitulo(), videoUpdated.getTitulo());
+        assertEquals(newObj.getDescricao(), videoUpdated.getDescricao());
+        assertEquals(newObj.getUrl(), videoUpdated.getUrl());
+        assertEquals("UrlTeste-Atualizado", videoUpdated.getUrl());
+        assertEquals(1L, videoUpdated.getId());
+
+        assertEquals(videoId1, videoUpdated);
     }
 
     @Test
     public void testaUpdateQuandoAlgunsItensSaoAtualizados(){
 
-        Videos oldObj = new Videos(null, "VideoTeste-Inicial", "DescricaoTeste-Inicial", "UrlTeste-Inicial");
         VideoUpdate newObj = new VideoUpdate();
         newObj.setTitulo("VideoTeste-Atualizado");
 
-        service.updateData(oldObj, newObj);
+        Videos videoUpdated = service.update(1L, newObj);
+        Videos videoId1 = service.findById(1L);
 
-        assertEquals(oldObj.getTitulo(), newObj.getTitulo());
-        assertEquals(oldObj.getDescricao(), "DescricaoTeste-Inicial");
-        assertEquals(oldObj.getUrl(), "UrlTeste-Inicial");
+        assertEquals(newObj.getTitulo(), videoUpdated.getTitulo());
+        assertEquals("Essa é uma descricao de um filme teste", videoUpdated.getDescricao());
+        assertEquals("http://url.aas.test", videoUpdated.getUrl());
+        assertEquals(videoId1, videoUpdated);
     }
 
     @Test
     public void testaUpdateQuandoAlgunsItensSaoAtualizadosEACategoriaTambem(){
 
-        Videos oldObj = new Videos(null, "VideoTeste-Inicial", "DescricaoTeste-Inicial", "UrlTeste-Inicial");
         VideoUpdate newObj = new VideoUpdate();
         newObj.setTitulo("VideoTeste-Atualizado");
         newObj.setCategoria(3L);
 
-        service.updateData(oldObj, newObj);
+        Videos videoUpdated = service.update(1L, newObj);
+        Videos videoId1 = service.findById(1L);
 
-        Optional<Categoria> byId = categoriaRepository.findById(3L);
-
-        assertEquals(oldObj.getTitulo(), newObj.getTitulo());
-        assertEquals(oldObj.getDescricao(), "DescricaoTeste-Inicial");
-        assertEquals(oldObj.getUrl(), "UrlTeste-Inicial");
-        if(byId.isPresent())
-            assertEquals(oldObj.getCategoriaId(), byId.get());
+        assertEquals(newObj.getTitulo(), videoUpdated.getTitulo());
+        assertEquals("Essa é uma descricao de um filme teste", videoUpdated.getDescricao());
+        assertEquals("http://url.aas.test", videoUpdated.getUrl());
+        assertEquals(videoId1, videoUpdated);
+        assertEquals(categoriaRepository.findById(3L).get(), videoUpdated.getCategoriaId());
     }
 
     @Test
-    public void verificaVideoRetornadoAPartirDeFormulario(){
-        VideoForm videoForm = new VideoForm();
-        videoForm.setTitulo("Teste Video Form");
-        videoForm.setDescricao("Descricao Teste Video Form");
-        videoForm.setUrl("url.teste.video.form");
-        videoForm.setCategoria(2L);
+    public void testaUpdateQuandoAlgunsItensSaoAtualizadosEACategoriaAtualizaComInexistente(){
 
-        Videos videos = service.retornaObjetoVideo(videoForm);
+        VideoUpdate newObj = new VideoUpdate();
+        newObj.setTitulo("VideoTeste-Atualizado");
+        newObj.setCategoria(300L);
 
-        if(videoForm.getCategoria() != null){
-            Optional<Categoria> byId = categoriaRepository.findById(2L);
-            if(byId.isPresent())
-                assertEquals(videos.getCategoriaId(), byId.get());
-        }
+        Videos videoUpdated = service.update(1L, newObj);
+        Videos videoId1 = service.findById(1L);
 
-        assertEquals(videos.getTitulo(), "Teste Video Form");
-        assertEquals(videos.getDescricao(), "Descricao Teste Video Form");
-        assertEquals(videos.getUrl(), "url.teste.video.form");
-
+        assertEquals(newObj.getTitulo(), videoUpdated.getTitulo());
+        assertEquals("Essa é uma descricao de um filme teste", videoUpdated.getDescricao());
+        assertEquals("http://url.aas.test", videoUpdated.getUrl());
+        assertEquals(videoId1, videoUpdated);
     }
 
     @Test
-    public void verificaVideoRetornadoAPartirDeFormularioQuandoCategoriaEhNula(){
-        VideoForm videoForm = new VideoForm();
-        videoForm.setTitulo("Teste Video Form");
-        videoForm.setDescricao("Descricao Teste Video Form");
-        videoForm.setUrl("url.teste.video.form");
+    public void VerificaInsertDeProdutoCorretamente(){
+        VideoForm form = new VideoForm("Titulo do Video", "Descricao do Video", "url.aas.teste", 2L);
+        Videos videoSalvo = service.insert(form);
 
-        Videos videos = service.retornaObjetoVideo(videoForm);
-
-        Optional<Categoria> byId = categoriaRepository.findById(1L);
-
-        assertEquals(videos.getTitulo(), "Teste Video Form");
-        assertEquals(videos.getDescricao(), "Descricao Teste Video Form");
-        assertEquals(videos.getUrl(), "url.teste.video.form");
-        if(byId.isPresent())
-            assertEquals(videos.getCategoriaId(), byId.get());
+        assertEquals(videoSalvo.getCategoriaId().getId(), 2L);
+        assertEquals("Titulo do Video", videoSalvo.getTitulo());
+        assertEquals("Descricao do Video", videoSalvo.getDescricao());
+        assertEquals("url.aas.teste", videoSalvo.getUrl());
     }
 
     @Test
-    public void verificaVideoRetornadoAPartirDeFormularioQuandoCategoriaEhInvalida(){
-        VideoForm videoForm = new VideoForm();
-        videoForm.setTitulo("Teste Video Form");
-        videoForm.setDescricao("Descricao Teste Video Form");
-        videoForm.setUrl("url.teste.video.form");
-        videoForm.setCategoria(100L);
+    public void verificaInsertDeProdutoQuandoNaoEhInformadoCategoria(){
+        VideoForm form = new VideoForm("Titulo do Video", "Descricao do Video", "url.aas.teste");
+        Videos videoSalvo = service.insert(form);
 
-        Videos videos = service.retornaObjetoVideo(videoForm);
-
-        Optional<Categoria> byId = categoriaRepository.findById(1L);
-
-        assertEquals(videos.getTitulo(), "Teste Video Form");
-        assertEquals(videos.getDescricao(), "Descricao Teste Video Form");
-        assertEquals(videos.getUrl(), "url.teste.video.form");
-        if(byId.isPresent())
-            assertEquals(videos.getCategoriaId(), byId.get());
+        assertEquals(videoSalvo.getCategoriaId().getId(), 1L);
+        assertEquals("Titulo do Video", videoSalvo.getTitulo());
+        assertEquals("Descricao do Video", videoSalvo.getDescricao());
+        assertEquals("url.aas.teste", videoSalvo.getUrl());
     }
+
+    @Test
+    public void verificaInsertDeProdutoQuandoCategoriaEhInvalida(){
+        VideoForm form = new VideoForm("Titulo do Video", "Descricao do Video", "url.aas.teste", 1000L);
+        Videos videoSalvo = service.insert(form);
+
+        assertEquals(videoSalvo.getCategoriaId().getId(), 1L);
+        assertEquals("Titulo do Video", videoSalvo.getTitulo());
+        assertEquals("Descricao do Video", videoSalvo.getDescricao());
+        assertEquals("url.aas.teste", videoSalvo.getUrl());
+    }
+
 
 }

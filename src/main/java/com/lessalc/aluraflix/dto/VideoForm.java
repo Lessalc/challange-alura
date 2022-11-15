@@ -16,6 +16,24 @@ public class VideoForm {
 
     private Long categoria;
 
+    public VideoForm() {
+    }
+
+    public VideoForm(String titulo, String descricao, String url, Long categoria) {
+        this.titulo = titulo;
+        this.descricao = descricao;
+        this.url = url;
+        this.categoria = categoria;
+    }
+
+    public VideoForm(String titulo, String descricao, String url) {
+        this.titulo = titulo;
+        this.descricao = descricao;
+        this.url = url;
+        this.categoria = null;
+    }
+
+
     public String getTitulo() {
         return titulo;
     }

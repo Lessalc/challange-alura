@@ -10,10 +10,8 @@ import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import org.hibernate.validator.constraints.Length;
 
 @Entity
 public class Categoria {
@@ -77,12 +75,12 @@ public class Categoria {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof Categoria)) return false;
-        Categoria categoria = (Categoria) o;
-        return Objects.equals(getId(), categoria.getId());
+        Categoria categoria1 = (Categoria) o;
+        return Objects.equals(getId(), categoria1.getId()) && Objects.equals(getCategoria(), categoria1.getCategoria()) && Objects.equals(getCor(), categoria1.getCor());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(getId());
+        return Objects.hash(getId(), getCategoria(), getCor());
     }
 }
