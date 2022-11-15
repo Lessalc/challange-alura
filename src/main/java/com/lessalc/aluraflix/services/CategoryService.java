@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Optional;
 
 import com.lessalc.aluraflix.dto.CategoriaUpdate;
+import com.lessalc.aluraflix.services.exception.ResourceNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -24,7 +25,9 @@ public class CategoryService {
 	}
 
 	public Categoria findCategoria(Long id) {
-		return repository.findById(id).get();
+		Optional<Categoria> categoria = repository.findById(id);
+
+		return categoria.orElseThrow(() -> new ResourceNotFoundException());
 	}
 
     public List<Categoria> findAll() {

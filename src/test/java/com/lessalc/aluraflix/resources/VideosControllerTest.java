@@ -80,7 +80,7 @@ public class VideosControllerTest {
     }
 
     @Test
-    public void testaRetornoComId_1() throws Exception{
+    public void testaRetornoComGetAll() throws Exception{
         URI uri = new URI("/videos");
 
         mockMvc.perform(MockMvcRequestBuilders
@@ -90,6 +90,19 @@ public class VideosControllerTest {
                 .andExpect(MockMvcResultMatchers.jsonPath("$[0].titulo").value("Filme Teste"))
                 .andExpect(MockMvcResultMatchers.jsonPath("$[0].descricao").value("Essa é uma descricao de um filme teste"))
                 .andExpect(MockMvcResultMatchers.jsonPath("$[0].url").value("http://url.aas.test"));
+    }
+
+    @Test
+    public void testaRetornoComGetId() throws Exception{
+        URI uri = new URI("/videos/1");
+
+        mockMvc.perform(MockMvcRequestBuilders
+                    .get(uri))
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.categoriaId").value(1L))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.titulo").value("Filme Teste"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.descricao").value("Essa é uma descricao de um filme teste"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.url").value("http://url.aas.test"));
     }
 
 
