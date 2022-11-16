@@ -16,6 +16,8 @@ import com.lessalc.aluraflix.services.CategoryService;
 import com.lessalc.aluraflix.services.VideosService;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import javax.validation.Valid;
+
 @RestController
 @RequestMapping(value = "/categorias")
 public class CategoriaController {
@@ -43,7 +45,7 @@ public class CategoriaController {
 	}
 
 	@PostMapping
-	public ResponseEntity<Categoria> createCategory(@RequestBody Categoria categoria){
+	public ResponseEntity<Categoria> createCategory(@RequestBody @Valid Categoria categoria){
 		categoria = service.insert(categoria);
 		// Criando um objeto URI para que possamos ter a localização no nosso header de onde o objeto foi criado
 		URI uri =  ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(categoria.getId()).toUri();

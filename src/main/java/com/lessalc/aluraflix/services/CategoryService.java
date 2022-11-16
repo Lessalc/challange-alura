@@ -19,8 +19,8 @@ public class CategoryService {
 	CategoriaRepository repository;
 	
 	public List<Videos> findVideos(Long id) {
+		Categoria categoria = findCategoria(id);
 
-		Categoria categoria = repository.findById(id).get();
 		return categoria.getVideos();
 	}
 
