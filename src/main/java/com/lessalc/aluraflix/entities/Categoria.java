@@ -38,6 +38,12 @@ public class Categoria {
         this.categoria = categoria;
     }
 
+    public Categoria(Long id, String categoria, String cor) {
+        this.id = id;
+        this.categoria = categoria;
+        this.cor = cor;
+    }
+
     public Long getId() {
         return id;
     }
@@ -82,5 +88,15 @@ public class Categoria {
     @Override
     public int hashCode() {
         return Objects.hash(getId(), getCategoria(), getCor());
+    }
+
+    @Override
+    public String toString() {
+        return "Categoria{" +
+                "id=" + id +
+                ", categoria='" + categoria + '\'' +
+                ", cor='" + cor + '\'' +
+                ", videos=" + videos +
+                '}';
     }
 }

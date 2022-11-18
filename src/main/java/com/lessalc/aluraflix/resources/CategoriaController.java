@@ -22,8 +22,13 @@ import javax.validation.Valid;
 @RequestMapping(value = "/categorias")
 public class CategoriaController {
 
-	@Autowired
+
 	private CategoryService service;
+
+	@Autowired
+	public CategoriaController(CategoryService service) {
+		this.service = service;
+	}
 
 	@GetMapping
 	public ResponseEntity<List<Categoria>> findAllCategory(){

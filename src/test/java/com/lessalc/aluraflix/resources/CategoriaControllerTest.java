@@ -1,14 +1,21 @@
 package com.lessalc.aluraflix.resources;
 
+import com.lessalc.aluraflix.entities.Categoria;
+import com.lessalc.aluraflix.services.CategoryService;
 import org.junit.After;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
@@ -29,17 +36,54 @@ import static org.junit.jupiter.api.Assertions.*;
 public class CategoriaControllerTest {
 
 
-    @Autowired
-    private MockMvc mockMvc;
+    //@Autowired
+    //private MockMvc mockMvc;
+
+    private CategoriaController controller;
+
+    @Mock
+    private CategoryService service;
+
+    @Before
+    public void setup(){
+        MockitoAnnotations.openMocks(this);
+        controller = new CategoriaController(service);
+    }
+
+    private List<Categoria> retornaCategorias(){
+        return new ArrayList<>(Arrays.asList(new Categoria(1L, "Livre", "Cinza"),
+                new Categoria(2L, "Programação", "Verde"),
+                new Categoria(3L, "Front-end", "Azul"),
+                new Categoria(4L, "Data Science", "Verde-claro")));
+    }
 
     @Test
     public void testaFindAll()throws Exception {
         URI uri = new URI("/categorias");
+        List<Categoria>  categorias = retornaCategorias();
+
+        Mockito.when(service.findAll()).thenReturn(categorias);
+        ResponseEntity<List<Categoria>> allCategory = controller.findAllCategory();
+
+        Assert.assertTrue(allCategory.getStatusCode().is2xxSuccessful());
+
+        Mockito.verify(service).findAll();
+    }
+
+    /*
+    @Test
+    public void testaFindAll()throws Exception {
+        URI uri = new URI("/categorias");
+        List<Categoria>  categorias = retornaCategorias();
+
+        Mockito.when(service.findAll()).thenReturn(categorias);
+
         mockMvc.perform(MockMvcRequestBuilders
                     .get(uri))
                 .andExpect(MockMvcResultMatchers.jsonPath("$").isNotEmpty())
                 .andExpect(MockMvcResultMatchers.jsonPath("$[1].categoria").value("Programação"));
     }
+
 
     @Test
     public void deveriaRetornarCategoriaEspecificaPeloId() throws Exception{
@@ -262,7 +306,7 @@ public class CategoriaControllerTest {
         mockMvc.perform(MockMvcRequestBuilders
                     .delete(uri))
                 .andExpect(MockMvcResultMatchers.status().isNotFound());
-    }
+    }*/
 
 
 }

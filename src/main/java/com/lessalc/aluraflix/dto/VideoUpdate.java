@@ -15,6 +15,15 @@ public class VideoUpdate {
 
     private Long categoria;
 
+    public VideoUpdate() {
+    }
+
+    public VideoUpdate(String titulo, String descricao, String url) {
+        this.titulo = titulo;
+        this.descricao = descricao;
+        this.url = url;
+    }
+
     public String getTitulo() {
         return titulo;
     }

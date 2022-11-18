@@ -1,5 +1,7 @@
 package com.lessalc.aluraflix.services;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -18,12 +20,15 @@ import com.lessalc.aluraflix.services.exception.ResourceNotFoundException;
 @Service
 public class VideosService {
 
-	@Autowired
 	private VideosRepository repository;
-	
-	@Autowired
 	private CategoriaRepository categoriaRepository;
-	
+
+	@Autowired
+	public VideosService(VideosRepository repository, CategoriaRepository categoriaRepository) {
+		this.repository = repository;
+		this.categoriaRepository = categoriaRepository;
+	}
+
 	public List<Videos> findAll(){
 		return repository.findAll();
 	}
