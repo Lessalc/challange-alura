@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Optional;
 
 import com.lessalc.aluraflix.dto.CategoriaUpdate;
+import com.lessalc.aluraflix.services.exception.BadRequestException;
 import com.lessalc.aluraflix.services.exception.ResourceNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -57,7 +58,8 @@ public class CategoryService {
 	}
 
 	public void deletarCategoria(Long id){
-
+		if(id == 1L)
+			throw new BadRequestException();
 		List<Videos> videos = findVideos(id);
 		Categoria categoria = findCategoria(1L);
 		videos.forEach(video -> video.setCategoriaId(categoria));

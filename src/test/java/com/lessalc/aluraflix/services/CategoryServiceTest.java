@@ -1,11 +1,10 @@
 package com.lessalc.aluraflix.services;
 
 import com.lessalc.aluraflix.dto.CategoriaUpdate;
-import com.lessalc.aluraflix.dto.VideoForm;
 import com.lessalc.aluraflix.entities.Categoria;
 import com.lessalc.aluraflix.entities.Videos;
 import com.lessalc.aluraflix.repositories.CategoriaRepository;
-import com.lessalc.aluraflix.repositories.VideosRepository;
+import com.lessalc.aluraflix.services.exception.BadRequestException;
 import com.lessalc.aluraflix.services.exception.ResourceNotFoundException;
 import org.junit.Assert;
 import org.junit.Before;
@@ -89,7 +88,6 @@ public class CategoryServiceTest {
     public void testaUpdateComAtualizacaoParcial(){
         CategoriaUpdate update = new CategoriaUpdate();
         update.setCategoria("DevOps");
-        update.setCategoria("DevOps");
 
         Mockito.when(categoriaRepository.findById(4L)).thenReturn(Optional.ofNullable(categorias.get(3)));
 
@@ -105,7 +103,7 @@ public class CategoryServiceTest {
 
 
     @Test
-    public void testaUpdateComCamposVazios(){
+    public void testaUpdateComCampoVazios(){
         CategoriaUpdate update = new CategoriaUpdate("", "Vermelho");
         Mockito.when(categoriaRepository.findById(2L)).thenReturn(Optional.ofNullable(categorias.get(1)));
 
@@ -115,6 +113,21 @@ public class CategoryServiceTest {
 
         Assert.assertEquals("Programação", categoriaAtualizada.getCategoria());
         Assert.assertEquals("Vermelho", categoriaAtualizada.getCor());
+        Mockito.verify(categoriaRepository).findById(2L);
+        Mockito.verify(categoriaRepository).save(categoriaAtualizada);
+    }
+
+    @Test
+    public void testaUpdateComTodosCamposVazios(){
+        CategoriaUpdate update = new CategoriaUpdate("", "");
+        Mockito.when(categoriaRepository.findById(2L)).thenReturn(Optional.ofNullable(categorias.get(1)));
+
+        service.update(2L, update);
+        Mockito.verify(categoriaRepository).save(captor.capture());
+        Categoria categoriaAtualizada = captor.getValue();
+
+        Assert.assertEquals("Programação", categoriaAtualizada.getCategoria());
+        Assert.assertEquals("Verde", categoriaAtualizada.getCor());
         Mockito.verify(categoriaRepository).findById(2L);
         Mockito.verify(categoriaRepository).save(categoriaAtualizada);
     }
@@ -130,11 +143,21 @@ public class CategoryServiceTest {
     }
 
     @Test
+    public void naoPermiteExcluirCategoria1(){
+        Assert.assertThrows(BadRequestException.class, () -> service.deletarCategoria(1L));
+    }
+
+    @Test
     public void retornaErroQuandoCategoriaNaoExiste(){
         Mockito.when(categoriaRepository.findById(10L)).thenReturn(Optional.empty());
         Assert.assertThrows(ResourceNotFoundException.class, () -> service.findCategoria(10L));
     }
 
-
-
+    @Test
+    public void retornaVideosDeUmaCategoria(){
+        Mockito.when(categoriaRepository.findById(1L)).thenReturn(Optional.ofNullable(categorias.get(0)));
+        List<Videos> videosCategoria1 = service.findVideos(1L);
+        Assert.assertEquals(videos.get(0), videosCategoria1.get(0));
+        Assert.assertEquals(videos.get(2), videosCategoria1.get(1));
+    }
 }

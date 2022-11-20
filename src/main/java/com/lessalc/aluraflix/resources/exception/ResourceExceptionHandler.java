@@ -3,6 +3,7 @@ package com.lessalc.aluraflix.resources.exception;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.lessalc.aluraflix.services.exception.BadRequestException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
@@ -23,8 +24,14 @@ public class ResourceExceptionHandler {
 	MessageSource messageSource;
 	
 	@ExceptionHandler(ResourceNotFoundException.class)
-	public ResponseEntity<StandardError> resourceNotFoundException(com.lessalc.aluraflix.services.exception.ResourceNotFoundException e){
+	public ResponseEntity<StandardError> resourceNotFoundException(ResourceNotFoundException e){
 		HttpStatus status = HttpStatus.NOT_FOUND;
+		return ResponseEntity.status(status).body(new StandardError(e.getMessage()));
+	}
+
+	@ExceptionHandler(BadRequestException.class)
+	public ResponseEntity<StandardError> BadRequestException(BadRequestException e){
+		HttpStatus status = HttpStatus.BAD_REQUEST;
 		return ResponseEntity.status(status).body(new StandardError(e.getMessage()));
 	}
 	
