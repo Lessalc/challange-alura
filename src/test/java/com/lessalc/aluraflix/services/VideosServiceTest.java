@@ -15,6 +15,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
@@ -29,12 +30,27 @@ public class VideosServiceTest {
     @Captor
     private ArgumentCaptor<Videos> captor;
 
+    private List<Categoria> categorias;
+    private List<Videos> videos;
+
     @Before
     public void setup(){
         MockitoAnnotations.openMocks(repository);
         MockitoAnnotations.openMocks(categoriaRepository);
         service = new VideosService(repository, categoriaRepository);
     }
+
+    @Before
+    public void populaDados(){
+        categorias = retornaCategorias();
+        videos = retornaVideos();
+
+        for (Categoria categoria : categorias) {
+            categoria.setVideos(videos.stream().filter(v ->
+                    v.getCategoriaId().getId().equals(categoria.getId())).collect(Collectors.toList()));
+        }
+    }
+
     private List<Categoria> retornaCategorias(){
         return new ArrayList<>(Arrays.asList(new Categoria(1L, "Livre", "Cinza"),
                 new Categoria(2L, "Programação", "Verde"),
@@ -53,7 +69,6 @@ public class VideosServiceTest {
 
     @Test
     public void testaInsertQuandoEnviadoUmaCategoriaCorretamente(){
-        List<Categoria> categorias = retornaCategorias();
         VideoForm form = new VideoForm("Video Inserido", "Descricao de video Inserido",
                 "url.videoInserido", 2L);
         Mockito.when(categoriaRepository.findById(2L)).thenReturn(Optional.ofNullable(categorias.get(1)));
@@ -73,7 +88,6 @@ public class VideosServiceTest {
 
     @Test
     public void testaInsertQuandoNaoEnviamosUmaCategoria(){
-        List<Categoria> categorias = retornaCategorias();
         VideoForm form = new VideoForm("Video Inserido", "Descricao de video Inserido",
                 "url.videoInserido");
         Mockito.when(categoriaRepository.findById(1L)).thenReturn(Optional.ofNullable(categorias.get(0)));
@@ -92,7 +106,6 @@ public class VideosServiceTest {
 
     @Test
     public void testaInsertQuandoEnviamosUmaCategoriaInvalida(){
-        List<Categoria> categorias = retornaCategorias();
         VideoForm form = new VideoForm("Video Inserido", "Descricao de video Inserido",
                 "url.videoInserido", 200L);
         Mockito.when(categoriaRepository.findById(200L)).thenReturn(Optional.empty());
@@ -114,8 +127,6 @@ public class VideosServiceTest {
 
     @Test
     public void testaUpdateQuandoTodosItensSaoAtualizadosExcetoCategoria(){
-        List<Videos> videos = retornaVideos();
-
         VideoUpdate newObj = new VideoUpdate("VideoTeste-Atualizado", "DescricaoTeste-Atualizado",
                 "UrlTeste-Atualizado");
 
@@ -138,7 +149,6 @@ public class VideosServiceTest {
     public void testaUpdateQuandoAlgunsItensSaoAtualizados(){
         VideoUpdate newObj = new VideoUpdate();
         newObj.setTitulo("VideoTeste-Atualizado");
-        List<Videos> videos = retornaVideos();
 
         Mockito.when(repository.findById(2L)).thenReturn(Optional.ofNullable(videos.get(1)));
 
@@ -161,9 +171,6 @@ public class VideosServiceTest {
         newObj.setDescricao("Nova Descricao-Atualizado");
         newObj.setCategoria(2L);
 
-        List<Videos> videos = retornaVideos();
-        List<Categoria> categorias = retornaCategorias();
-
         Mockito.when(repository.findById(2L)).thenReturn(Optional.ofNullable(videos.get(1)));
         Mockito.when(categoriaRepository.findById(newObj.getCategoria())).thenReturn(Optional.ofNullable(categorias.get(1)));
 
@@ -185,9 +192,6 @@ public class VideosServiceTest {
         VideoUpdate newObj = new VideoUpdate();
         newObj.setDescricao("Nova Descricao-Atualizado");
         newObj.setCategoria(300L);
-
-        List<Videos> videos = retornaVideos();
-        List<Categoria> categorias = retornaCategorias();
 
         Mockito.when(repository.findById(2L)).thenReturn(Optional.ofNullable(videos.get(1)));
         Mockito.when(categoriaRepository.findById(newObj.getCategoria())).thenReturn(Optional.empty());

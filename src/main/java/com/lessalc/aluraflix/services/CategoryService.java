@@ -14,10 +14,13 @@ import com.lessalc.aluraflix.repositories.CategoriaRepository;
 
 @Service
 public class CategoryService {
+	private CategoriaRepository repository;
 
 	@Autowired
-	CategoriaRepository repository;
-	
+	public CategoryService(CategoriaRepository repository) {
+		this.repository = repository;
+	}
+
 	public List<Videos> findVideos(Long id) {
 		Categoria categoria = findCategoria(id);
 

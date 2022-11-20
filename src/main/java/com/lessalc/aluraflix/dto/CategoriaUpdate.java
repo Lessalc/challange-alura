@@ -6,6 +6,14 @@ public class CategoriaUpdate {
 
     private String cor;
 
+    public CategoriaUpdate() {
+    }
+
+    public CategoriaUpdate(String categoria, String cor) {
+        this.categoria = categoria;
+        this.cor = cor;
+    }
+
     public String getCategoria() {
         return categoria;
     }
