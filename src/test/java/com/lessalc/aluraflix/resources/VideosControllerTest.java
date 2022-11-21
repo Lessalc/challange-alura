@@ -10,6 +10,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.test.web.servlet.result.JsonPathResultMatchers;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 import java.net.URI;
@@ -26,169 +27,90 @@ public class VideosControllerTest {
     private MockMvc mockMvc;
 
     @Test
-    public void deveriaCadastrarUmNovoVideo() throws Exception {
-        URI uri = new URI("/videos");
-        String novoVideo = "{\"categoria\": 3,\"titulo\": \"Adicionado\",\"descricao\":\"Descricao de filme adicionado\",\"url\":\"http://url.aas.test2\"}";
+    public void testaIntegracaoVideo_InsereNovoVideo_Ler_Altera_Deleta() throws Exception{
+        // ******************TESTANDO CRIACAO DE VIDEO - INSERINDO CATEGORIA INEXISTENTE*******************************
 
-        mockMvc
-                .perform(MockMvcRequestBuilders
-                        .post(uri)
-                        .content(novoVideo)
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(MockMvcResultMatchers.status().is(201));
-    }
-
-    @Test
-    public void deveriaFalharEmCadastrarUmNovoVideoSemTitulo() throws Exception {
-        URI uri = new URI("/videos");
-        String novoVideo = "{\"categoria\": 3,\"descricao\":\"Descricao de filme adicionado\",\"url\":\"http://url.aas.test2\"}";
-
-        mockMvc
-                .perform(MockMvcRequestBuilders
-                        .post(uri)
-                        .content(novoVideo)
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(MockMvcResultMatchers.status().is(400));
-    }
-
-    @Test
-    public void deveriaCadastrarUmNovoVideoMesmoComCategoriaInexistenteEVerificaSeEhAtribuidaCategoria1L() throws Exception {
-        URI uri = new URI("/videos");
-        String novoVideo = "{\"categoria\": 20,\"titulo\": \"Adicionado\",\"descricao\":\"Descricao de filme adicionado\",\"url\":\"http://url.aas.test2\"}";
-
-        mockMvc
-                .perform(MockMvcRequestBuilders
-                        .post(uri)
-                        .content(novoVideo)
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(MockMvcResultMatchers.status().is(201))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.categoriaId.id").value(1L));
-    }
-
-    @Test
-    public void deveriaCadastrarUmNovoVideoMesmoSemInserirCategoriaEVerificaSeEhAtribuidaCategoria1L() throws Exception {
-        URI uri = new URI("/videos");
-        String novoVideo = "{\"titulo\": \"Adicionado\",\"descricao\":\"Descricao de filme adicionado\",\"url\":\"http://url.aas.test2\"}";
-
-        mockMvc
-                .perform(MockMvcRequestBuilders
-                        .post(uri)
-                        .content(novoVideo)
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(MockMvcResultMatchers.status().is(201))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.categoriaId.id").value(1L));
-    }
-
-    @Test
-    public void testaRetornoComGetAll() throws Exception{
-        URI uri = new URI("/videos");
+        URI uri = new URI("/categorias");
+        String categoriaNova = "{\"categoria\": \"Livre\",\n" +
+                "\"cor\": \"Cinza\"}";
 
         mockMvc.perform(MockMvcRequestBuilders
-                        .get(uri))
-                .andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(MockMvcResultMatchers.jsonPath("$[0].categoriaId").value(1L))
-                .andExpect(MockMvcResultMatchers.jsonPath("$[0].titulo").value("Filme Teste"))
-                .andExpect(MockMvcResultMatchers.jsonPath("$[0].descricao").value("Essa é uma descricao de um filme teste"))
-                .andExpect(MockMvcResultMatchers.jsonPath("$[0].url").value("http://url.aas.test"));
-    }
+                    .post(uri)
+                    .content(categoriaNova)
+                    .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(MockMvcResultMatchers.status().isCreated())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.categoria").value("Livre"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.cor").value("Cinza"));
 
-    @Test
-    public void testaRetornoComGetId() throws Exception{
-        URI uri = new URI("/videos/1");
+        URI uriVideo = new URI("/videos");
+        String novoVideo = "{\"titulo\": \"Adicionado\",\"descricao\":\"Descricao de filme adicionado\",\"url\":\"http://url.aas.test\",\"categoria\":\"2\"}";
+
+        mockMvc.perform(MockMvcRequestBuilders
+                    .post(uriVideo)
+                    .content(novoVideo)
+                    .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(MockMvcResultMatchers.status().is(201))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.categoriaId.id").value(1L));
+
+        // ******************TESTANDO FALHA EM CRIAÇÃO DE VIDEO COM DADOS INCOMPLETOS*******************************
+        uri = new URI("/videos");
+        novoVideo = "{\"categoria\": 3,\"descricao\":\"Descricao de filme adicionado\",\"url\":\"http://url.aas.test2\"}";
+
+        mockMvc.perform(MockMvcRequestBuilders
+                    .post(uri)
+                    .content(novoVideo)
+                    .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(MockMvcResultMatchers.status().is(400));
+
+        // ******************TESTANDO BUSCA DE VIDEO POR ID*******************************
+        uri = new URI("/videos/1");
 
         mockMvc.perform(MockMvcRequestBuilders
                     .get(uri))
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.categoriaId").value(1L))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.titulo").value("Filme Teste"))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.descricao").value("Essa é uma descricao de um filme teste"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.titulo").value("Adicionado"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.descricao").value("Descricao de filme adicionado"))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.url").value("http://url.aas.test"));
-    }
 
-
-    @Test
-    public void verificaCamposNulosVaziosEAlteradosEmUmaAtualizacao() throws Exception{
-        URI uri = new URI("/videos/1");
-        String videoAlterado = "{\"titulo\": \"Novo Titulo, campo único\",\"url\":\"\"}";
+        // ******************TESTANDO ATUALIZACAO DE VIDEO*******************************
+        uri = new URI("/videos/1");
+        novoVideo = "{\"descricao\":\"Descricao de filme modificada\",\"url\":\"\"}";
 
         mockMvc.perform(MockMvcRequestBuilders
                     .put(uri)
-                    .content(videoAlterado)
+                    .content(novoVideo)
                     .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().isCreated())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.id").value(1L))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.titulo").value("Novo Titulo, campo único"))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.descricao").value("Essa é uma descricao de um filme teste"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.categoriaId.id").value(1L))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.titulo").value("Adicionado"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.descricao").value("Descricao de filme modificada"))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.url").value("http://url.aas.test"));
-    }
 
-    @Test
-    public void idNaoEncontradoParaGet() throws Exception{
-        URI uri = new URI("/videos/500");
+        // ******************TESTANDO BUSCA DE VIDEO POR TITULO*******************************
+        uri = new URI("/videos/");
 
         mockMvc.perform(MockMvcRequestBuilders
-                .get(uri))
-            .andExpect(MockMvcResultMatchers.status().isNotFound())
-            .andExpect(MockMvcResultMatchers.jsonPath("$.error").value("Não encontrado!"));
-    }
+                    .get(uri)
+                    .queryParam("titulo","adicionado"))
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.jsonPath("$[0].categoriaId.id").value(1L))
+                .andExpect(MockMvcResultMatchers.jsonPath("$[0].titulo").value("Adicionado"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$[0].descricao").value("Descricao de filme modificada"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$[0].url").value("http://url.aas.test"));
 
-    @Test
-    public void idNaoEncontradoParaPut() throws Exception{
-        URI uri = new URI("/videos/500");
-        String videoAlterado = "{\"titulo\": \"Novo Titulo, campo único\",\"url\":\"\"}";
-
+        // ******************TESTANDO BUSCA DE VIDEO POR TITULO - NÃO EXISTENTE*******************************
         mockMvc.perform(MockMvcRequestBuilders
-                    .put(uri)
-                    .content(videoAlterado)
-                    .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(MockMvcResultMatchers.status().isNotFound())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.error").value("Não encontrado!"));
-    }
+                    .get(uri)
+                    .queryParam("titulo","Outro"))
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.jsonPath("$").isEmpty());
 
-    @Test
-    public void deveriaDeletarVideoExistente() throws Exception{
-        URI uri = new URI("/videos/2");
+        // ******************DELETANDO VIDEO*******************************
+        uri = new URI("/videos/1");
 
         mockMvc.perform(MockMvcRequestBuilders
                     .delete(uri))
                 .andExpect(MockMvcResultMatchers.status().isNoContent());
     }
-
-    @Test
-    public void deveriaFalharEmDeletarVideoInexistente() throws Exception{
-        URI uri = new URI("/videos/100");
-
-        mockMvc.perform(MockMvcRequestBuilders
-                    .delete(uri))
-                .andExpect(MockMvcResultMatchers.status().isNotFound())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.error").value("Não encontrado!"));
-    }
-
-    @Test
-    public void deveriaRetornarVideoQuandoBuscamosPeloTitulo() throws Exception{
-        String titulo = "teste";
-        URI uri = new URI("/videos/");
-
-        mockMvc.perform(MockMvcRequestBuilders
-                    .get(uri)
-                    .queryParam("titulo","teste"))
-                .andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(MockMvcResultMatchers.jsonPath("$[0].categoriaId.id").value(1L))
-                .andExpect(MockMvcResultMatchers.jsonPath("$[0].titulo").value("Filme Teste"))
-                .andExpect(MockMvcResultMatchers.jsonPath("$[0].descricao").value("Essa é uma descricao de um filme teste"))
-                .andExpect(MockMvcResultMatchers.jsonPath("$[0].url").value("http://url.aas.test"));
-    }
-
-    @Test
-    public void deveriaFalharEmRetornarVideoQuandoBuscamosPorUmTituloInexistente() throws Exception{
-        String titulo = "outro";
-        URI uri = new URI("/videos/");
-
-        mockMvc.perform(MockMvcRequestBuilders
-                    .get(uri)
-                    .queryParam("titulo",titulo))
-                .andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(MockMvcResultMatchers.jsonPath("$").isEmpty());
-    }
-
 }
